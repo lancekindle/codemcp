@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
 
+"""Core implementation for code entity manipulation (classes and functions).
+
+This module provides the underlying implementation for:
+- read_class.py
+- read_function.py
+- write_class.py
+- write_function.py
+
+This module is not intended to be used directly. Instead, use the individual 
+tool modules which serve as thin wrappers around these implementations.
+"""
+
 import ast
 import logging
 import os

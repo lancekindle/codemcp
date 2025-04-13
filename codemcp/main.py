@@ -10,7 +10,10 @@ from mcp.server.fastmcp import FastMCP
 
 from .common import normalize_file_path
 from .tools.chmod import chmod
-from .tools.code_entity import read_class, read_function, write_class, write_function
+from .tools.read_class import read_class
+from .tools.read_function import read_function
+from .tools.write_class import write_class
+from .tools.write_function import write_function
 from .tools.edit_file import edit_file_content
 from .tools.glob import MAX_RESULTS, glob_files
 from .tools.grep import grep_files
