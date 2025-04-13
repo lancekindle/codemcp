@@ -469,10 +469,74 @@ Example:
   chmod a+x path/to/file  # Makes a file executable by all users
   chmod a-x path/to/file  # Makes a file non-executable for all users
 
+## ReadClass chat_id path class_name
+
+Reads a specific class definition from a Python file.
+This tool extracts just the class definition without the surrounding code.
+
+Args:
+    path: The absolute path to the Python file
+    class_name: The name of the class to read
+    chat_id: The unique ID to identify the chat session
+
+Example:
+  ReadClass 1-feature-branch /path/to/file.py MyClass  # Returns just the MyClass definition
+
+## ReadFunction chat_id path function_name [class_name]
+
+Reads a specific function or method definition from a Python file.
+When class_name is provided, it reads a method from that class.
+This tool extracts just the function/method definition without the surrounding code.
+
+Args:
+    path: The absolute path to the Python file
+    function_name: The name of the function or method to read
+    chat_id: The unique ID to identify the chat session
+    class_name: Optional class name if the function is a method
+
+Example:
+  ReadFunction 1-feature-branch /path/to/file.py my_function  # Read a standalone function
+  ReadFunction 1-feature-branch /path/to/file.py my_method MyClass  # Read a method from a class
+
+## WriteClass chat_id path class_name new_code description
+
+Writes or replaces a class definition in a Python file.
+If the class doesn't exist, it will be added to the file at an appropriate location.
+If the file doesn't exist, it will be created.
+
+Args:
+    path: The absolute path to the Python file
+    class_name: The name of the class to write or replace
+    new_code: The complete class definition code
+    description: Short description of the change
+    chat_id: The unique ID to identify the chat session
+
+Example:
+  WriteClass 1-feature-branch /path/to/file.py MyClass "class MyClass:\n    def __init__(self):\n        pass" "Add MyClass"
+
+## WriteFunction chat_id path function_name new_code description [class_name]
+
+Writes or replaces a function or method definition in a Python file.
+When class_name is provided, it writes a method to that class.
+If the function/method doesn't exist, it will be added to the file/class.
+If the file doesn't exist, it will be created.
+
+Args:
+    path: The absolute path to the Python file
+    function_name: The name of the function or method to write or replace
+    new_code: The complete function/method definition code
+    description: Short description of the change
+    chat_id: The unique ID to identify the chat session
+    class_name: Optional class name if the function is a method
+
+Example:
+  WriteFunction 1-feature-branch /path/to/file.py my_function "def my_function():\n    return True" "Add my_function"
+  WriteFunction 1-feature-branch /path/to/file.py my_method "def my_method(self):\n    return True" "Add my_method" MyClass
+
 ## Summary
 
 Args:
-    subtool: The subtool to execute (ReadFile, WriteFile, EditFile, LS, InitProject, UserPrompt, RunCommand, RM, Think, Chmod)
+    subtool: The subtool to execute (ReadFile, WriteFile, EditFile, LS, InitProject, UserPrompt, RunCommand, RM, Think, Chmod, ReadClass, ReadFunction, WriteClass, WriteFunction)
     path: The path to the file or directory to operate on
     content: Content for WriteFile subtool (any type will be serialized to string if needed)
     old_string: String to replace for EditFile subtool
@@ -484,6 +548,9 @@ Args:
     user_prompt: The user's verbatim text (for UserPrompt subtool)
     thought: The thought content (for Think subtool)
     mode: The chmod mode to apply (a+x or a-x) for Chmod subtool
+    class_name: Name of the class for code entity tools (ReadClass, ReadFunction, WriteClass, WriteFunction)
+    function_name: Name of the function for code entity tools (ReadFunction, WriteFunction)
+    new_code: New implementation for code entity tools (WriteClass, WriteFunction)
     chat_id: A unique ID to identify the chat session (required for all tools EXCEPT InitProject)
 
 # Chat ID
