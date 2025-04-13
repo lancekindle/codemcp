@@ -79,7 +79,6 @@ dependencies = [
     { name = "click" },
     { name = "editorconfig" },
     { name = "mcp", extra = ["cli"] },
-    { name = "pytest-xdist" },
     { name = "pyyaml" },
     { name = "ruff" },
     { name = "toml" },
@@ -93,6 +92,7 @@ dev = [
     { name = "mypy" },
     { name = "pyright" },
     { name = "pytest" },
+    { name = "pytest-xdist" },
     { name = "ruff" },
     { name = "tomli-w" },
 ]
@@ -103,7 +103,6 @@ requires-dist = [
     { name = "click", specifier = ">=8.1.8" },
     { name = "editorconfig", specifier = ">=0.17.0" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.2.0" },
-    { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "ruff", specifier = ">=0.9.10" },
     { name = "toml", specifier = ">=0.10.2" },
@@ -117,6 +116,7 @@ dev = [
     { name = "mypy", specifier = ">=1.0.0" },
     { name = "pyright", specifier = ">=1.1.350" },
     { name = "pytest", specifier = ">=7.0.0" },
+    { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "ruff", specifier = ">=0.1.5" },
     { name = "tomli-w", specifier = ">=1.0.0" },
 ]

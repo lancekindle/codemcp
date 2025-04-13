@@ -106,8 +106,17 @@ class MCPEndToEndTestCase(TestCase, unittest.IsolatedAsyncioTestCase):
         This method can be overridden by subclasses to customize the repository setup.
         By default, it initializes a git repository and creates an initial commit.
         """
-        # Initialize and configure git
-        await self.git_run(["init", "-b", "main"])
+        # Initialize and configure git - use a git version compatible approach
+        # First try the modern "-b main" approach, fall back to older method if it fails
+        try:
+            # Try modern git approach with -b flag
+            await self.git_run(["init", "-b", "main"])
+        except subprocess.CalledProcessError:
+            # Fallback to older git approach (initialize and then set default branch)
+            await self.git_run(["init"])
+            # Create initial commit on master branch, then rename to main
+            await self.git_run(["checkout", "-b", "main"])
+        
         await self.git_run(["config", "user.email", "test@example.com"])
         await self.git_run(["config", "user.name", "Test User"])
 
