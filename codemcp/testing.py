@@ -116,7 +116,7 @@ class MCPEndToEndTestCase(TestCase, unittest.IsolatedAsyncioTestCase):
             await self.git_run(["init"])
             # Create initial commit on master branch, then rename to main
             await self.git_run(["checkout", "-b", "main"])
-        
+
         await self.git_run(["config", "user.email", "test@example.com"])
         await self.git_run(["config", "user.name", "Test User"])
 

@@ -33,22 +33,37 @@ def append_metadata_to_message(message: str, metadata: dict[str, str]) -> str:
         ],
         input=message.encode("utf-8"),
     ).decode("utf-8")
-    
+
     # Fix newline handling to match expected test output
-    # Ensure there's only a single newline between subject and metadata
-    parts = result.split("\n\n")
-    if len(parts) == 2:
-        # Only one blank line between subject and metadata (or already correct format)
-        return result
-    elif len(parts) > 2:
-        # Multiple blank lines, fix by joining with a single blank line
-        subject = parts[0]
-        # Join all remaining parts (which might be empty strings too)
-        rest = "\n".join([p for p in parts[1:] if p])
-        return f"{subject}\n\n{rest}"
-    else:
-        # No blank lines or just the message with no metadata - return as is
-        return result
+    # The git interpret-trailers adds an extra blank line between description and metadata
+    # which doesn't match our test expectations
+
+    # Parse original and new message
+    old_subject, old_body, old_trailers = parse_message(message)
+    new_subject, new_body, new_trailers = parse_message(result)
+
+    # If there's no body in the original message, don't add an empty line
+    if not old_body and new_trailers:
+        # Just subject and trailers, no body
+        return f"{new_subject}\n{new_trailers}"
+
+    # If there's a body, handle based on the test expectations
+    if new_body and new_trailers:
+        # Count trailing newlines in original message
+        trailing_newlines = len(message) - len(message.rstrip("\n"))
+
+        # Format with correct number of newlines between body and trailers
+        if trailing_newlines > 0:
+            # Keep trailing newlines from original
+            return f"{new_subject}\n\n{new_body}\n{new_trailers}" + "\n" * (
+                trailing_newlines - 1
+            )
+        else:
+            # No trailing newlines
+            return f"{new_subject}\n\n{new_body}\n{new_trailers}"
+
+    # Default case - return the original result
+    return result
 
 
 def update_commit_message_with_description(

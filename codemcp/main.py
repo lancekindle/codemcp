@@ -112,7 +112,14 @@ async def codemcp(
             "ReadClass": {"path", "class_name", "chat_id"},
             "ReadFunction": {"path", "function_name", "class_name", "chat_id"},
             "WriteClass": {"path", "class_name", "new_code", "description", "chat_id"},
-            "WriteFunction": {"path", "function_name", "new_code", "description", "class_name", "chat_id"},
+            "WriteFunction": {
+                "path",
+                "function_name",
+                "new_code",
+                "description",
+                "class_name",
+                "chat_id",
+            },
         }
 
         # Check if subtool exists
@@ -396,30 +403,32 @@ async def codemcp(
             chmod_mode = cast(Literal["a+x", "a-x"], mode)
             result = await chmod(normalized_path, chmod_mode, chat_id)
             return result.get("resultForAssistant", "Chmod operation completed")
-            
+
         if subtool == "ReadClass":
             if path is None:
                 raise ValueError("path is required for ReadClass subtool")
             if class_name is None:
                 raise ValueError("class_name is required for ReadClass subtool")
-                
+
             # Normalize the path (expand tilde) before proceeding
             normalized_path = normalize_file_path(path)
-            
+
             return await read_class(normalized_path, class_name, chat_id)
-            
+
         if subtool == "ReadFunction":
             if path is None:
                 raise ValueError("path is required for ReadFunction subtool")
             if function_name is None:
                 raise ValueError("function_name is required for ReadFunction subtool")
-                
+
             # Normalize the path (expand tilde) before proceeding
             normalized_path = normalize_file_path(path)
-            
+
             # class_name is optional for ReadFunction
-            return await read_function(normalized_path, function_name, chat_id, class_name)
-            
+            return await read_function(
+                normalized_path, function_name, chat_id, class_name
+            )
+
         if subtool == "WriteClass":
             if path is None:
                 raise ValueError("path is required for WriteClass subtool")
@@ -429,12 +438,14 @@ async def codemcp(
                 raise ValueError("new_code is required for WriteClass subtool")
             if description is None:
                 raise ValueError("description is required for WriteClass subtool")
-                
+
             # Normalize the path (expand tilde) before proceeding
             normalized_path = normalize_file_path(path)
-            
-            return await write_class(normalized_path, class_name, new_code, description, chat_id)
-            
+
+            return await write_class(
+                normalized_path, class_name, new_code, description, chat_id
+            )
+
         if subtool == "WriteFunction":
             if path is None:
                 raise ValueError("path is required for WriteFunction subtool")
@@ -444,12 +455,19 @@ async def codemcp(
                 raise ValueError("new_code is required for WriteFunction subtool")
             if description is None:
                 raise ValueError("description is required for WriteFunction subtool")
-                
+
             # Normalize the path (expand tilde) before proceeding
             normalized_path = normalize_file_path(path)
-            
+
             # class_name is optional for WriteFunction
-            return await write_function(normalized_path, function_name, new_code, description, chat_id, class_name)
+            return await write_function(
+                normalized_path,
+                function_name,
+                new_code,
+                description,
+                chat_id,
+                class_name,
+            )
     except Exception:
         logging.error("Exception", exc_info=True)
         raise
@@ -614,15 +632,28 @@ def init_codemcp_project(path: str, python: bool = False) -> str:
                 print(f"File already exists, skipping: {output_path}")
                 return None
 
-            # Read the template content
-            with open(template_file, "r") as f:
-                content = f.read()
+            # Read the template content with error handling for encoding
+            try:
+                # Try UTF-8 first
+                with open(template_file, "r", encoding="utf-8") as f:
+                    content = f.read()
+            except UnicodeDecodeError:
+                # Fallback to latin-1 or binary if UTF-8 fails
+                with open(template_file, "rb") as f:
+                    binary_content = f.read()
+                    try:
+                        content = binary_content.decode("latin-1")
+                    except UnicodeDecodeError:
+                        # If still can't decode, use a placeholder message
+                        content = (
+                            f"# Binary file (could not decode): {template_file.name}"
+                        )
 
             # Replace placeholders in content
             content = replace_placeholders(content)
 
-            # Write to the output file
-            with open(output_path, "w") as f:
+            # Write to the output file with utf-8 encoding
+            with open(output_path, "w", encoding="utf-8") as f:
                 f.write(content)
 
             # Return the relative path for git tracking

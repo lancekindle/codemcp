@@ -374,13 +374,24 @@ codemcp-id: test-chat-id""",
 
         try:
             # Initialize a git repository in this directory
-            await self.git_run(["init", "-b", "main"], cwd=home_temp_dir_path)
+            await self.git_run(["init"], cwd=home_temp_dir_path)
             await self.git_run(
                 ["config", "user.email", "test@example.com"], cwd=home_temp_dir_path
             )
             await self.git_run(
                 ["config", "user.name", "Test User"], cwd=home_temp_dir_path
             )
+            # Switch to main branch - older git versions don't support -b flag with init
+            try:
+                await self.git_run(["checkout", "-b", "main"], cwd=home_temp_dir_path)
+            except Exception:
+                # If the command fails, the repo might already be on main branch or
+                # it might be on master - try creating main branch if needed
+                try:
+                    await self.git_run(["branch", "-M", "main"], cwd=home_temp_dir_path)
+                except Exception:
+                    # If all branch commands fail, continue anyway
+                    pass
 
             # Create initial commit
             readme_path = os.path.join(home_temp_dir_path, "README.md")

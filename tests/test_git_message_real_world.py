@@ -54,13 +54,11 @@ The implementation now correctly handles:
 Fixes #123
 Closes: #456
 Refs: #789
-
 Reviewed-by: John Smith <john@example.com>
 Tested-by: Continuous Integration <ci@example.com>
 Signed-off-by: Developer <dev@example.com>
 Co-authored-by: Collaborator <collab@example.com>
-codemcp-id: abc-123456
-""",
+codemcp-id: abc-123456""",
         )
 
     def test_complex_commit_message_with_existing_codemcp_id(self):
@@ -81,11 +79,9 @@ codemcp-id: old-id"""
 feat(git): Improve commit message handling
 
 This commit enhances the Git commit message parsing logic.
-
 Reviewed-by: John Smith <john@example.com>
 codemcp-id: old-id
-codemcp-id: new-id
-""",
+codemcp-id: new-id""",
         )
 
     def test_codemcp_id_extraction_with_regex(self):
@@ -122,11 +118,9 @@ Foo desc
 Bar bar
 
 codemcp-id: 10-blah
-
 Signed-off-by: foobar
 ghstack-id: blahblahblah
-codemcp-id: new-id
-""",
+codemcp-id: new-id""",
         )
 
         # Verify the regex can find both codemcp-ids

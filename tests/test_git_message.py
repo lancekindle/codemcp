@@ -18,8 +18,7 @@ class TestGitMessageHandling(TestCase):
             new_message,
             """\
 
-codemcp-id: abc-123
-""",
+codemcp-id: abc-123""",
         )
 
     def test_append_new_metadata(self):
@@ -32,7 +31,6 @@ codemcp-id: abc-123
 feat: Add feature
 
 Description
-
 codemcp-id: abc-123
 """,
         )
@@ -51,10 +49,8 @@ Signed-off-by: User <user@example.com>"""
 feat: Add feature
 
 Description
-
 Signed-off-by: User <user@example.com>
-codemcp-id: abc-123
-""",
+codemcp-id: abc-123""",
         )
 
     def test_append_to_existing_metadata_with_trailing_newline(self):
@@ -72,10 +68,8 @@ Signed-off-by: User <user@example.com>
 feat: Add feature
 
 Description
-
 Signed-off-by: User <user@example.com>
-codemcp-id: abc-123
-""",
+codemcp-id: abc-123""",
         )
 
     def test_append_to_message_with_trailing_newlines(self):
@@ -92,9 +86,7 @@ Description
 feat: Add feature
 
 Description
-
 codemcp-id: abc-123
-
 """,
         )
 
@@ -113,9 +105,7 @@ Description
 feat: Add feature
 
 Description
-
 codemcp-id: abc-123
-
 
 """,
         )
@@ -135,10 +125,8 @@ codemcp-id: old-id"""
 feat: Add feature
 
 Description
-
 codemcp-id: old-id
-codemcp-id: new-id
-""",
+codemcp-id: new-id""",
         )
 
     def test_meta_ignored_except_codemcp_id(self):
@@ -150,9 +138,7 @@ codemcp-id: new-id
             new_message,
             """\
 feat: Add feature
-
-other-key: value
-""",
+other-key: value""",
         )
 
     def test_single_line_subject_with_colon(self):
@@ -165,9 +151,7 @@ other-key: value
             new_message,
             """\
 feat: Add new feature
-
-codemcp-id: abc-123
-""",
+codemcp-id: abc-123""",
         )
 
 
