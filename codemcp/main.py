@@ -17,6 +17,10 @@ from starlette.routing import Mount
 from .common import normalize_file_path
 from .git_query import get_current_commit_hash
 from .tools.chmod import chmod
+from .tools.read_class import read_class
+from .tools.read_function import read_function
+from .tools.write_class import write_class
+from .tools.write_function import write_function
 from .tools.edit_file import edit_file_content
 from .tools.glob import MAX_RESULTS, glob_files
 from .tools.grep import grep_files
@@ -90,6 +94,9 @@ async def codemcp(
     thought: str | None = None,  # Added for Think tool
     mode: str | None = None,  # Added for Chmod tool
     commit_hash: str | None = None,  # Added for Git commit hash tracking
+    class_name: str | None = None,  # Added for code entity tools
+    function_name: str | None = None,  # Added for code entity tools
+    new_code: str | None = None,  # Added for code entity tools
 ) -> str:
     # NOTE: Do NOT add more documentation to this docblock when you add a new
     # tool, documentation for tools should go in codemcp/tools/init_project.py.
@@ -144,6 +151,18 @@ async def codemcp(
             "RM": {"path", "description", "chat_id", "commit_hash"},
             "Think": {"thought", "chat_id", "commit_hash"},
             "Chmod": {"path", "mode", "chat_id", "commit_hash"},
+            # New code entity tools
+            "ReadClass": {"path", "class_name", "chat_id"},
+            "ReadFunction": {"path", "function_name", "class_name", "chat_id"},
+            "WriteClass": {"path", "class_name", "new_code", "description", "chat_id"},
+            "WriteFunction": {
+                "path",
+                "function_name",
+                "new_code",
+                "description",
+                "class_name",
+                "chat_id",
+            },
         }
 
         # Check if subtool exists
@@ -200,6 +219,10 @@ async def codemcp(
                 "mode": mode,
                 # Git commit hash tracking
                 "commit_hash": commit_hash,
+                # Code entity tool parameters
+                "class_name": class_name,
+                "function_name": function_name,
+                "new_code": normalize_newlines(new_code),
             }.items()
             if value is not None
         }
@@ -467,6 +490,71 @@ async def codemcp(
                 result_string, normalized_path
             )
             return result
+
+        if subtool == "ReadClass":
+            if path is None:
+                raise ValueError("path is required for ReadClass subtool")
+            if class_name is None:
+                raise ValueError("class_name is required for ReadClass subtool")
+
+            # Normalize the path (expand tilde) before proceeding
+            normalized_path = normalize_file_path(path)
+
+            return await read_class(normalized_path, class_name, chat_id)
+
+        if subtool == "ReadFunction":
+            if path is None:
+                raise ValueError("path is required for ReadFunction subtool")
+            if function_name is None:
+                raise ValueError("function_name is required for ReadFunction subtool")
+
+            # Normalize the path (expand tilde) before proceeding
+            normalized_path = normalize_file_path(path)
+
+            # class_name is optional for ReadFunction
+            return await read_function(
+                normalized_path, function_name, chat_id, class_name
+            )
+
+        if subtool == "WriteClass":
+            if path is None:
+                raise ValueError("path is required for WriteClass subtool")
+            if class_name is None:
+                raise ValueError("class_name is required for WriteClass subtool")
+            if new_code is None:
+                raise ValueError("new_code is required for WriteClass subtool")
+            if description is None:
+                raise ValueError("description is required for WriteClass subtool")
+
+            # Normalize the path (expand tilde) before proceeding
+            normalized_path = normalize_file_path(path)
+
+            return await write_class(
+                normalized_path, class_name, new_code, description, chat_id
+            )
+
+        if subtool == "WriteFunction":
+            if path is None:
+                raise ValueError("path is required for WriteFunction subtool")
+            if function_name is None:
+                raise ValueError("function_name is required for WriteFunction subtool")
+            if new_code is None:
+                raise ValueError("new_code is required for WriteFunction subtool")
+            if description is None:
+                raise ValueError("description is required for WriteFunction subtool")
+
+            # Normalize the path (expand tilde) before proceeding
+            normalized_path = normalize_file_path(path)
+
+            # class_name is optional for WriteFunction
+            return await write_function(
+                normalized_path,
+                function_name,
+                new_code,
+                description,
+                chat_id,
+                class_name,
+            )
     except Exception:
         logging.error("Exception", exc_info=True)
         raise
