@@ -585,7 +585,7 @@ def init_codemcp_project(path: str, python: bool = False) -> str:
             if result.returncode != 0 and files_to_add:
                 # No commits yet, add files and make initial commit
                 for file in files_to_add:
-                    subprocess.run(["git", "add", file], cwd=project_path, check=True)
+                    subprocess.run(["git", "add", file], cwd=project_path, check=False)
                 commit_msg = "chore: initialize codemcp project"
                 if python:
                     commit_msg += " with Python template"

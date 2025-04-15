@@ -81,6 +81,8 @@ def test_init_command_with_python():
         package_name = re.sub(r"[^a-z0-9_]", "_", project_name.lower())
 
         # Run the init_codemcp_project function with Python option
+        # this used to silently fail to add files to git because it was adding files that were git-ignored (.ruff/...)
+        # the error would manifest only at the bottom when git log --oneline fails because there were no commits
         result = init_codemcp_project(temp_dir, python=True)
 
         # Check that the function reports success with Python message
