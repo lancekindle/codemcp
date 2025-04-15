@@ -71,6 +71,7 @@ line-ending = "auto"
 # Pytest configuration
 testpaths = ["tests", "e2e"]
 addopts = "-n auto --tb=native"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.pyright]
 # Pyright configuration with strict settings
