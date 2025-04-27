@@ -75,8 +75,6 @@ async def codemcp(
     | dict
     | list
     | None = None,  # Allow any type, will be serialized to string if needed
-    # old_string: str | None = None,
-    # new_string: str | None = None,
     offset: int | None = None,
     limit: int | None = None,
     description: str | None = None,
@@ -84,8 +82,6 @@ async def codemcp(
     include: str | None = None,
     command: str | None = None,
     arguments: str | None = None,
-    # old_str: str | None = None,  # Added because Claude often hallucinates this
-    # new_str: str | None = None,  # Added because Claude often hallucinates this
     chat_id: str | None = None,  # Added for chat identification
     user_prompt: str | None = None,  # Added for InitProject commit message
     subject_line: str | None = None,  # Added for InitProject commit message
@@ -128,17 +124,6 @@ async def codemcp(
         # Define expected parameters for each subtool
         expected_params = {
             "ReadFile": {"path", "offset", "limit", "chat_id", "commit_hash"},
-            # "WriteFile": {"path", "content", "description", "chat_id", "commit_hash"},
-            # "EditFile": {
-            #     "path",
-            #     "old_string",
-            #     "new_string",
-            #     "description",
-            #     "old_str",
-            #     "new_str",
-            #     "chat_id",
-            #     "commit_hash",
-            # },
             "LS": {"path", "chat_id", "commit_hash"},
             "InitProject": {
                 "path",
@@ -181,13 +166,8 @@ async def codemcp(
             """Normalize string to use \n for all newlines."""
             return s.replace("\r\n", "\n") if isinstance(s, str) else s
 
-        # Normalize content, old_string, and new_string to use consistent \n newlines
+        # Normalize content to use consistent \n newlines
         content_norm = normalize_newlines(content)
-        # old_string_norm = normalize_newlines(old_string)
-        # new_string_norm = normalize_newlines(new_string)
-        # Also normalize backward compatibility parameters
-        # old_str_norm = normalize_newlines(old_str)
-        # new_str_norm = normalize_newlines(new_str)
         # And user prompt which might contain code blocks
         user_prompt_norm = normalize_newlines(user_prompt)
 
@@ -197,8 +177,6 @@ async def codemcp(
             for param, value in {
                 "path": path,
                 "content": content_norm,
-                # "old_string": old_string_norm,
-                # "new_string": new_string_norm,
                 "offset": offset,
                 "limit": limit,
                 "description": description,
@@ -206,9 +184,6 @@ async def codemcp(
                 "include": include,
                 "command": command,
                 "arguments": arguments,
-                # # Include backward compatibility parameters
-                # "old_str": old_str_norm,
-                # "new_str": new_str_norm,
                 # Chat ID for session identification
                 "chat_id": chat_id,
                 # InitProject commit message parameters
@@ -252,57 +227,6 @@ async def codemcp(
             result = await read_file_content(normalized_path, offset, limit, chat_id)
             result, new_commit_hash = await append_commit_hash(result, normalized_path)
             return result
-
-        # if subtool == "WriteFile":
-        #     if path is None:
-        #         raise ValueError("path is required for WriteFile subtool")
-        #     if description is None:
-        #         raise ValueError("description is required for WriteFile subtool")
-        #
-        #     # Normalize the path (expand tilde) before proceeding
-        #     normalized_path = normalize_file_path(path)
-        #
-        #     import json
-        #
-        #     # If content is not a string, serialize it to a string using json.dumps
-        #     if content is not None and not isinstance(content, str):
-        #         content_str = json.dumps(content)
-        #     else:
-        #         content_str = content or ""
-        #
-        #     if chat_id is None:
-        #         raise ValueError("chat_id is required for WriteFile subtool")
-        #     result = await write_file_content(
-        #         normalized_path, content_str, description, chat_id
-        #     )
-        #     result, new_commit_hash = await append_commit_hash(result, normalized_path)
-        #     return result
-
-        # if subtool == "EditFile":
-        #     if path is None:
-        #         raise ValueError("path is required for EditFile subtool")
-        #     if description is None:
-        #         raise ValueError("description is required for EditFile subtool")
-        #     if old_string is None and old_str is None:
-        #         # TODO: I want telemetry to tell me when this occurs.
-        #         raise ValueError(
-        #             "Either old_string or old_str is required for EditFile subtool (use empty string for new file creation)"
-        #         )
-        #
-        #     # Normalize the path (expand tilde) before proceeding
-        #     normalized_path = normalize_file_path(path)
-        #
-        #     # Accept either old_string or old_str (prefer old_string if both are provided)
-        #     old_content = old_string or old_str or ""
-        #     # Accept either new_string or new_str (prefer new_string if both are provided)
-        #     new_content = new_string or new_str or ""
-        #     if chat_id is None:
-        #         raise ValueError("chat_id is required for EditFile subtool")
-        #     result = await edit_file_content(
-        #         normalized_path, old_content, new_content, None, description, chat_id
-        #     )
-        #     result, new_commit_hash = await append_commit_hash(result, normalized_path)
-        #     return result
 
         if subtool == "LS":
             if path is None:
